@@ -1,11 +1,38 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Tracker</title>
-</head>
-<body>
-        
-</body>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Tracker</title>
+        <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono&display=swap" rel="stylesheet" />
+        <link href="https://fonts.googleapis.com/css2?family=Lato&family=Roboto+Mono&display=swap" rel="stylesheet" />
+        <link rel="stylesheet" href="styles.css" />
+
+    </head>
+
+    <body>
+        <header>
+            <div class="container">
+                <div class="selector-container">
+                    <span class="datepicker-button">
+                        <img src="calendar-icon.png" alt="calendar-icon">
+                    </span>
+                    <input type="date" id="date-selector">
+                </div>
+                <div id="tracker"></div>
+                <button id="tracker-btn">Track</button>
+            </div>
+        </header>
+        <main id="tracker-calendar">
+            <div>Mo</div>
+            <div>Tu</div>
+            <div>We</div>
+            <div>Th</div>
+            <div>Fr</div>
+            <div>Sa</div>
+            <div>Su</div>
+        </main>
+        <button id="test-btn">Test</button>
+        <script src="script.js"></script>
+    </body>
 </html>
