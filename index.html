@@ -4,35 +4,39 @@
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Tracker</title>
-        <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono&display=swap" rel="stylesheet" />
-        <link href="https://fonts.googleapis.com/css2?family=Lato&family=Roboto+Mono&display=swap" rel="stylesheet" />
         <link rel="stylesheet" href="styles.css" />
 
     </head>
-
     <body>
-        <header>
-            <div class="container">
-                <div class="selector-container">
-                    <span class="datepicker-button">
-                        <img src="calendar-icon.png" alt="calendar-icon">
-                    </span>
-                    <input type="date" id="date-selector">
+        <div id= "tracker-container">
+            <label for="cycle-input" id="cycle-label" class="time-label">Cycle</label>
+            <input type="number" id="cycle-input" class="time-input" value="28" max="50"/>
+            <label for="time-input" id="time-label" class="time-label">Period</label>
+            <input type="number" id="time-input" class="time-input" value="5" max="10"/>
+            <div id="date-label" class="time-label">Pick a starting day</div>
+            <div id="start-date" class="time-input"></div>
+            <button id="track-btn">Track</button>
+        </div>
+        <div id="calendar-container">
+            <div id="calendar-header">
+                <div id="month-label"></div>
+                <div id="btn-container">
+                    <button class="control-btn" id="today-btn">Today</button>
+                    <button class="control-btn" id="prev-btn">Prev</button>
+                    <button class="control-btn" id="next-btn">Next</button>
                 </div>
-                <div id="tracker"></div>
-                <button id="tracker-btn">Track</button>
             </div>
-        </header>
-        <main id="tracker-calendar">
-            <div>Mo</div>
-            <div>Tu</div>
-            <div>We</div>
-            <div>Th</div>
-            <div>Fr</div>
-            <div>Sa</div>
-            <div>Su</div>
-        </main>
-        <button id="test-btn">Test</button>
+            <div id="calendar-weekdays">
+                <div>Mo</div>
+                <div>Tu</div>
+                <div>We</div>
+                <div>Th</div>
+                <div>Fr</div>
+                <div>Sa</div>
+                <div>Su</div>
+            </div>
+            <div id="calendar"></div>
+        </div>
         <script src="script.js"></script>
     </body>
 </html>
