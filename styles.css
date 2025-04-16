@@ -1,8 +1,8 @@
 :root {
     /* colors */
-    --primary-color: #dfdfe2;
-    --primary-background-color: #e77588;
-    --secondary-background-color: #7a0eb9;
+    --primary-color: #f0e1d8;
+    --primary-background-color: #81232f;
+    --secondary-background-color: #979797;
     --background-color: #1b1b32;
     --foreground-color: #3b3b4f;
     --highlight-color: #f1be32;
@@ -42,13 +42,14 @@ body {
     gap: 50px;
 }
 
-#tracker-container {
+#tracker-form {
     width: 30%;
     height: fit-content;
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
+    text-align: center;
     gap: 12px;
     border: 1px solid var(--primary-color);
     padding: 10px 0;
@@ -97,6 +98,18 @@ body {
     justify-content: space-between;
 }
 
+#calendar-date-label {
+    display: flex;
+}
+
+.calendar-date-label {
+    margin-right: 8px;
+}
+
+#btn-container {
+    justify-self: end;
+}
+
 button {
     height: 100%;
     background: transparent;
@@ -137,6 +150,7 @@ button:hover {
     display: grid;
     grid-template-columns: repeat(7, 7fr);
     border: 1px solid var(--primary-color);
+    overflow: hidden;
 }
 
 #calendar * {
@@ -150,6 +164,7 @@ button:hover {
 
 #calendar button {
     font-size: var(--root-font-size);
+    height: 100px;
 }
 
 #calendar button:hover {

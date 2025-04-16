@@ -50,6 +50,7 @@ const months = [
 ]
 
 const monthLabel = document.getElementById("month-label");
+const yearLabel = document.getElementById("year-label");
 const calendar = document.getElementById("calendar");
 const testButton = document.getElementById("test-btn");
 const prevButton = document.getElementById("prev-btn");
@@ -58,11 +59,13 @@ const todayButton = document.getElementById("today-btn");
 const startDate = document.getElementById("start-date");
 const timeInput = document.getElementById("time-input");
 const cycleInput = document.getElementById("cycle-input");
-const trackButton = document.getElementById("track-btn");
+const trackForm = document.getElementById("tracker-form");
 
 class MyDate {
-    constructor(day, month, year) {
-        this.day = day;
+    constructor(month, year, day) {
+        if (day !== undefined) {
+            this.day = day;
+        }
         this.month = month;
         this.year = year;
     }
@@ -77,77 +80,89 @@ class MyDate {
                 this.year++;
             }
         }
+        return this;
     }
 }
 
 const today = new Date();
-let selectedDate = new MyDate(today.getDate(), today.getMonth() + 1, today.getFullYear());
-let cycleStartDate;
+let selectedDate = new MyDate(today.getMonth() + 1, today.getFullYear(), today.getDate());
+let currentDisplayMonth = new MyDate(today.getMonth() + 1, today.getFullYear());
+let highlightedDays = [];
 
 const printDate = () => {
+    console.log(selectedDate, currentDisplayMonth);
     calendar.innerHTML = "";
-    monthLabel.innerText = `${months[selectedDate.month - 1].name} ${selectedDate.year}`;
-    fillDays(selectedDate.month, selectedDate.year);
+    monthLabel.innerText = months[currentDisplayMonth.month - 1].name;
+    yearLabel.innerText = currentDisplayMonth.year;
+    fillDays(currentDisplayMonth.month, currentDisplayMonth.year);
+    if (selectedDate.month === currentDisplayMonth.month) {
+        highlightDay(selectedDate.day);        
+    }
 };
 
-const splitDate = (date) => {
-    return date.split("-").reverse().map((item) => Number(item)); // [day, month, year]
+const formatCurrentDate = () => {
+    const { day, month, year } = selectedDate;
+    return `${day}.${month}.${year}`
 }
+// fills current day into startDate input
+startDate.textContent = formatCurrentDate();
 
 const fillDays = (month, year) => {
-    // Fill the calendar with the days of the month
+    // fills the calendar with the days of the month
     const firstWeekday = (calcFirstweekday(year, month) + 5) % 7;
-    let i = firstWeekday; //sa = 5, so = 6, mo = 0, di = 1, mi = 2, do = 3, fr = 4
+    let i = firstWeekday;
     let extraDays = 1;
-    for (let j = 0; j < 42; j++) {
+    for (let j = 0; j < 364; j++) {
         if (i > 0) {
-            calendar.innerHTML += `<button class="grayed-out prev-month">${months[((month - 2 >= 0) ? month - 2 : 11)].days - i + 1}</button>`;
+            calendar.innerHTML += `<button class="grayed-out prev-month" id="${months[((month - 2 >= 0) ? month - 2 : 11)].days - i + 1}p">${months[((month - 2 >= 0) ? month - 2 : 11)].days - i + 1}</button>`;
             i--;
         } else if (j > months[month - 1].days - 1 + firstWeekday) {
-            calendar.innerHTML += `<button class="grayed-out next-month">${extraDays}</button>`
+            calendar.innerHTML += `<button class="grayed-out next-month" id="${extraDays}n">${extraDays}</button>`
             extraDays++;
         } else {
             calendar.innerHTML += `<button class="days" id="${j+1-firstWeekday}">${j+1-firstWeekday}</button>`;
         }
     }
+    // adds button functionality to days of the month
     const dayButtons = document.querySelectorAll("button[class=days]");
     dayButtons.forEach((button) => {
         button.addEventListener("click", () => {
             highlightDay(button.id);
-            selectedDate = new MyDate(button.id, month, year);
-            startDate.textContent = `${button.id > 9 ? button.id : "0" + button.id}.${month > 9 ? month : "0" + month}.${year}`;
+            selectedDate = new MyDate(month, year, button.id);
+            startDate.textContent = formatCurrentDate();
         });
     });
+    // adds button functionality to days outside
     const grayButtons = document.querySelectorAll("button[class^=grayed-out]");
     grayButtons.forEach((button) => {
         button.addEventListener("click", () => {
             if (button.classList.contains("prev-month")) {
+                selectedDate = new MyDate((month - 1 < 1) ? 12 : month - 1, year, Number([...button.id].slice(0, -1).join("")));
                 prevMonth();
             } else {
+                selectedDate = new MyDate((month + 1 > 12) ? 1 : month + 1, year, Number([...button.id].slice(0, -1).join("")));
                 nextMonth();
             }
-        })
-    })
+        });
+    });
 }
-
+// 
 const prevMonth = () => {
-    console.log(selectedDate.month, selectedDate.year);
-    if (selectedDate.month === 1) {
-        selectedDate.month = 12;
-        selectedDate.year--;
+    if (currentDisplayMonth.month === 1) {
+        currentDisplayMonth.month = 12;
+        currentDisplayMonth.year--;
     } else {
-        selectedDate.month--;
+        currentDisplayMonth.month--;
     }
     printDate();
 }
 
 const nextMonth = () => {
-    console.log(selectedDate.month, selectedDate.year);
-    if (selectedDate.month === 12) {
-        selectedDate.month = 1;
-        selectedDate.year++;
+    if (currentDisplayMonth.month === 12) {
+        currentDisplayMonth.month = 1;
+        currentDisplayMonth.year++;
     } else {
-        selectedDate.month++;
+        currentDisplayMonth.month++;
     }
     printDate();
 }
@@ -170,49 +185,76 @@ const calcFirstweekday = (year, month, day=1) => {
 }
 
 const todayDate = () => {
-    const newSelectedDate = new MyDate(today.getDate(), today.getMonth() + 1, today.getFullYear());
-    if (JSON.stringify(selectedDate) === JSON.stringify(newSelectedDate)) {
-        return;
-    }
-    selectedDate = newSelectedDate;
+    selectedDate = new MyDate(today.getMonth() + 1, today.getFullYear(), today.getDate());
+    currentDisplayMonth = {...selectedDate};
     printDate();
-    highlightDay(selectedDate.day);
 }
 
-const highlightPeriod = () => {
+const highlightPeriod = (cycleStart) => {
     const time = parseInt(timeInput.value);
     const cycle = parseInt(cycleInput.value);
-    cycleStartDate = selectedDate;
-    if (isNaN(time) || isNaN(cycle) || cycleStartDate === undefined) {
+    if (isNaN(time) || isNaN(cycle) || cycleStart === undefined) {
         return;
     }
-    printDate();
-    let startDay = cycleStartDate.day;
-    let i = 0;
-    while (i < cycle) {
-        console.log("i: ", i, "startDay: ", startDay, "time: ", time);
-        const currentDay = document.getElementById(startDay + i);
-        if (currentDay === null) {
-            break;
+    let startDay = Number(cycleStart.day);
+    highlightedDays.forEach((highlightDay) => {
+        highlightDay.style.color = "#f0e1d8";
+    })
+    highlightedDays = [];
+    for (let i = 0; i < cycle; i++) {
+        const currentDay = document.getElementById(`${startDay + i}`);
+        if (currentDay !== null) {
+            highlightedDays.push(currentDay);
+            console.log("start + i: ", startDay + i, "currentDay: ", currentDay);
+            if (i < time) {
+                currentDay.style.color = "rgb(255, 0, 0)";
+            } else {
+                currentDay.style.color = "rgb(35, 231, 35)";
+            }
         }
-        if (i < time) {
-            currentDay.style.backgroundColor = "rgba(114, 19, 19, 0.3)";
-        } else {
-            currentDay.style.backgroundColor = "rgba(19, 114, 19, 0.3)";
-        }
-        i++;	
     }
+    console.log(highlightedDays);
+    // if (selectedDate.year === cycleStart.year) {
+    //     highlightPeriod(cycleStart.addDays(cycle));
+    // }
 }
 
 todayButton.addEventListener("click", todayDate);
 prevButton.addEventListener("click", prevMonth);
 nextButton.addEventListener("click", nextMonth);
-trackButton.addEventListener("click", highlightPeriod);
+trackForm.addEventListener("submit", (event) => {
+    event.preventDefault();
+    const cycleStart = new MyDate(selectedDate.month, selectedDate.year, selectedDate.day);
+    highlightPeriod(cycleStart);
+});
+
 calendar.addEventListener("wheel", (event) => {
     if (event.deltaY > 0) {
         nextMonth();
     } else {
         prevMonth();
+    }
+})
+
+cycleInput.addEventListener("wheel", (event) => {
+    if (event.deltaY > 0) {
+        cycleInput.value--;
+    } else {
+        cycleInput.value++;
+    }
+    if (cycleInput.value <= 1) {
+        cycleInput.value = 1;
+    }
+})
+
+timeInput.addEventListener("wheel", (event) => {
+    if (event.deltaY > 0) {
+        timeInput.value--;
+    } else {
+        timeInput.value++;
+    }
+    if (timeInput.value <= 1) {
+        timeInput.value = 1;
     }
 })
 
